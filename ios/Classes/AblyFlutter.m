@@ -669,7 +669,6 @@ static const FlutterHandler _realtimeAuthCreateTokenRequest = ^void(AblyFlutter 
     NSDictionary<NSString *, FlutterHandler>* _handlers;
     AblyStreamsChannel* _streamsChannel;
     FlutterMethodChannel* _channel;
-    PushNotificationEventHandlers* _pushNotificationEventHandlers;
 }
 
 @synthesize instanceStore = _instanceStore;
@@ -708,9 +707,6 @@ static const FlutterHandler _realtimeAuthCreateTokenRequest = ^void(AblyFlutter 
     _instanceStore = [AblyInstanceStore sharedInstance];
     _channel = channel;
     _streamsChannel = streamsChannel;
-    UNUserNotificationCenter *const center = UNUserNotificationCenter.currentNotificationCenter;
-    _pushNotificationEventHandlers = [[PushNotificationEventHandlers alloc] initWithDelegate: center.delegate andMethodChannel: channel];
-    center.delegate = _pushNotificationEventHandlers;
     
     _handlers = @{
         AblyPlatformMethod_getPlatformVersion: _getPlatformVersion,
@@ -814,11 +810,6 @@ static const FlutterHandler _realtimeAuthCreateTokenRequest = ^void(AblyFlutter 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
     // This error will be used when the first Ably client is made.
     _instanceStore.didFailToRegisterForRemoteNotificationsWithError_error = error;
-}
-
-- (BOOL)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-    [_pushNotificationEventHandlers application:application didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
-    return YES;
 }
 
 @end
